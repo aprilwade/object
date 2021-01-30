@@ -77,6 +77,7 @@ impl Object {
             Architecture::X86_64 => true,
             Architecture::S390x => true,
             Architecture::Mips => false,
+            Architecture::Ppc => true,
             _ => {
                 return Err(Error(format!(
                     "unimplemented architecture {:?}",
@@ -349,6 +350,7 @@ impl Object {
             Architecture::X86_64 => elf::EM_X86_64,
             Architecture::S390x => elf::EM_S390,
             Architecture::Mips => elf::EM_MIPS,
+            Architecture::Ppc => elf::EM_PPC,
             _ => {
                 return Err(Error(format!(
                     "unimplemented architecture {:?}",
@@ -667,6 +669,37 @@ impl Object {
                             (RelocationKind::GotBaseRelative, RelocationEncoding::S390xDbl, 32) => {
                                 elf::R_390_GOTPCDBL
                             }
+                            (RelocationKind::Elf(x), _, _) => x,
+                            _ => {
+                                return Err(Error(format!("unimplemented relocation {:?}", reloc)));
+                            }
+                        },
+                        Architecture::Ppc => match (reloc.kind, reloc.encoding, reloc.size) {
+                            (RelocationKind::Absolute, RelocationEncoding::Generic, 14) => elf::R_PPC_ADDR14,
+                            (RelocationKind::Absolute, RelocationEncoding::PpcBranchTakenHint, 14) => elf::R_PPC_ADDR14_BRTAKEN,
+                            (RelocationKind::Absolute, RelocationEncoding::PpcBranchNotTakenHint, 14) => elf::R_PPC_ADDR14_BRNTAKEN,
+                            (RelocationKind::Absolute, RelocationEncoding::Generic, 16) => elf::R_PPC_ADDR16,
+                            (RelocationKind::Absolute, RelocationEncoding::Ppc16Ha, 16) => elf::R_PPC_ADDR16_HA,
+                            (RelocationKind::Absolute, RelocationEncoding::Ppc16Hi, 16) => elf::R_PPC_ADDR16_HI,
+                            (RelocationKind::Absolute, RelocationEncoding::Ppc16Lo, 16) => elf::R_PPC_ADDR16_LO,
+                            (RelocationKind::Absolute, RelocationEncoding::Generic, 24) => elf::R_PPC_ADDR24,
+                            (RelocationKind::Absolute, RelocationEncoding::Generic, 32) => elf::R_PPC_ADDR32,
+                            (RelocationKind::Relative, RelocationEncoding::Generic, 16) => elf::R_PPC_REL16,
+                            (RelocationKind::Relative, RelocationEncoding::Ppc16Ha, 16) => elf::R_PPC_REL16_HA,
+                            (RelocationKind::Relative, RelocationEncoding::Ppc16Hi, 16) => elf::R_PPC_REL16_HI,
+                            (RelocationKind::Relative, RelocationEncoding::Ppc16Lo, 16) => elf::R_PPC_REL16_LO,
+                            (RelocationKind::Relative, RelocationEncoding::Generic, 24) => elf::R_PPC_REL24,
+                            (RelocationKind::Relative, RelocationEncoding::Generic, 32) => elf::R_PPC_REL32,
+                            (RelocationKind::PltRelative, RelocationEncoding::Generic, 24) => elf::R_PPC_PLTREL24,
+                            (RelocationKind::PltRelative, RelocationEncoding::Generic, 32) => elf::R_PPC_PLTREL32,
+                            (RelocationKind::Got, RelocationEncoding::Generic, 16) => elf::R_PPC_GOT16,
+                            (RelocationKind::Got, RelocationEncoding::Ppc16Ha, 16) => elf::R_PPC_GOT16_HA,
+                            (RelocationKind::Got, RelocationEncoding::Ppc16Hi, 16) => elf::R_PPC_GOT16_HI,
+                            (RelocationKind::Got, RelocationEncoding::Ppc16Lo, 16) => elf::R_PPC_GOT16_LO,
+                            (RelocationKind::SectionOffset, RelocationEncoding::Generic, 16) => elf::R_PPC_SECTOFF,
+                            (RelocationKind::SectionOffset, RelocationEncoding::Ppc16Ha, 16) => elf::R_PPC_SECTOFF_HA,
+                            (RelocationKind::SectionOffset, RelocationEncoding::Ppc16Hi, 16) => elf::R_PPC_SECTOFF_HI,
+                            (RelocationKind::SectionOffset, RelocationEncoding::Ppc16Lo, 16) => elf::R_PPC_SECTOFF_LO,
                             (RelocationKind::Elf(x), _, _) => x,
                             _ => {
                                 return Err(Error(format!("unimplemented relocation {:?}", reloc)));

@@ -306,6 +306,90 @@ fn parse_relocation<Elf: FileHeader>(
             }
             r_type => (RelocationKind::Elf(r_type), 0),
         },
+        elf::EM_PPC => match reloc.r_type(endian) {
+            elf::R_PPC_ADDR14 => (RelocationKind::Absolute, 14),
+            elf::R_PPC_ADDR14_BRTAKEN => {
+                encoding = RelocationEncoding::PpcBranchTakenHint;
+                (RelocationKind::Absolute, 14)
+            }
+            elf::R_PPC_ADDR14_BRNTAKEN => {
+                encoding = RelocationEncoding::PpcBranchNotTakenHint;
+                (RelocationKind::Absolute, 14)
+            }
+            elf::R_PPC_ADDR16 => (RelocationKind::Absolute, 16),
+            elf::R_PPC_ADDR16_HA => {
+                encoding = RelocationEncoding::Ppc16Ha;
+                (RelocationKind::Absolute, 16)
+            }
+            elf::R_PPC_ADDR16_HI => {
+                encoding = RelocationEncoding::Ppc16Hi;
+                (RelocationKind::Absolute, 16)
+            }
+            elf::R_PPC_ADDR16_LO => {
+                encoding = RelocationEncoding::Ppc16Lo;
+                (RelocationKind::Absolute, 16)
+            }
+            elf::R_PPC_ADDR24 => (RelocationKind::Absolute, 24),
+            elf::R_PPC_ADDR32 => (RelocationKind::Absolute, 32),
+
+            elf::R_PPC_REL14 => (RelocationKind::Relative, 14),
+            elf::R_PPC_REL14_BRTAKEN => {
+                encoding = RelocationEncoding::PpcBranchTakenHint;
+                (RelocationKind::Relative, 14)
+            }
+            elf::R_PPC_REL14_BRNTAKEN => {
+                encoding = RelocationEncoding::PpcBranchNotTakenHint;
+                (RelocationKind::Relative, 14)
+            }
+            elf::R_PPC_REL16 => (RelocationKind::Relative, 16),
+            elf::R_PPC_REL16_HA => {
+                encoding = RelocationEncoding::Ppc16Ha;
+                (RelocationKind::Relative, 16)
+            }
+            elf::R_PPC_REL16_HI => {
+                encoding = RelocationEncoding::Ppc16Hi;
+                (RelocationKind::Relative, 16)
+            }
+            elf::R_PPC_REL16_LO => {
+                encoding = RelocationEncoding::Ppc16Lo;
+                (RelocationKind::Relative, 16)
+            }
+            elf::R_PPC_REL24 => (RelocationKind::Relative, 24),
+            elf::R_PPC_REL32 => (RelocationKind::Relative, 32),
+
+            elf::R_PPC_PLTREL24 => (RelocationKind::PltRelative, 24),
+            elf::R_PPC_PLTREL32 => (RelocationKind::PltRelative, 32),
+
+            elf::R_PPC_SECTOFF => (RelocationKind::SectionOffset, 16),
+            elf::R_PPC_SECTOFF_HA => {
+                encoding = RelocationEncoding::Ppc16Ha;
+                (RelocationKind::SectionOffset, 16)
+            }
+            elf::R_PPC_SECTOFF_HI => {
+                encoding = RelocationEncoding::Ppc16Hi;
+                (RelocationKind::SectionOffset, 16)
+            }
+            elf::R_PPC_SECTOFF_LO => {
+                encoding = RelocationEncoding::Ppc16Lo;
+                (RelocationKind::SectionOffset, 16)
+            }
+
+            elf::R_PPC_GOT16 => (RelocationKind::Got, 16),
+            elf::R_PPC_GOT16_HA => {
+                encoding = RelocationEncoding::Ppc16Ha;
+                (RelocationKind::Got, 16)
+            }
+            elf::R_PPC_GOT16_HI => {
+                encoding = RelocationEncoding::Ppc16Hi;
+                (RelocationKind::Got, 16)
+            }
+            elf::R_PPC_GOT16_LO => {
+                encoding = RelocationEncoding::Ppc16Lo;
+                (RelocationKind::Got, 16)
+            }
+
+            r_type => (RelocationKind::Elf(r_type), 0),
+        }
         _ => (RelocationKind::Elf(reloc.r_type(endian)), 0),
     };
     let sym = reloc.r_sym(endian) as usize;

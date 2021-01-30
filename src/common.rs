@@ -10,6 +10,7 @@ pub enum Architecture {
     S390x,
     Wasm32,
     X86_64,
+    Ppc,
 }
 
 impl Architecture {
@@ -26,6 +27,7 @@ impl Architecture {
             Architecture::S390x => Some(AddressSize::U64),
             Architecture::Wasm32 => Some(AddressSize::U32),
             Architecture::X86_64 => Some(AddressSize::U64),
+            Architecture::Ppc => Some(AddressSize::U32),
         }
     }
 }
@@ -281,6 +283,21 @@ pub enum RelocationKind {
 pub enum RelocationEncoding {
     /// Generic encoding.
     Generic,
+
+    /// PowerPC address, upper 16 bits wth adjustment for sign extension of the lower 16 bits
+    Ppc16Ha,
+
+    /// PowerPC address, upper 16 bits
+    Ppc16Hi,
+
+    /// PowerPC address, lower 16 bits
+    Ppc16Lo,
+
+    /// PowerPC branch instruction with a taken hint
+    PpcBranchTakenHint,
+
+    /// PowerPC branch instruction with a not-taken hint
+    PpcBranchNotTakenHint,
 
     /// x86 sign extension at runtime.
     ///

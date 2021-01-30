@@ -128,6 +128,7 @@ where
                     Architecture::Unknown
                 }
             }
+            elf::EM_PPC => Architecture::Ppc,
             _ => Architecture::Unknown,
         }
     }
